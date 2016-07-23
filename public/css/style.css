@@ -1,0 +1,75 @@
+body {
+  /*background-image: url(http://www.naturewallpaper.eu/desktopwallpapers/sky/1024x768/ghosts-in-the-sky-1024x768.jpg);*/
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+h1{
+	font-family: 'Courier New';
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+}
+
+.test{
+
+	background: transparent;
+	width: 450px;
+	height: 350px;
+	display: inline-block;
+}
+
+.new-table{
+	width:300px;
+	height: 440px;
+	float: right;
+	text-align: center;
+	margin-top: 25px;
+}
+
+.n-table{
+	width:30px;
+	float: ;
+	text-align: center;
+}
+
+.pie{
+	width:450px;
+	height: 350px;
+	display: inline-block;
+
+}
+
+.Tt{
+	width: 450px;
+	height: 350px;
+	display: inline-block;
+
+}
+
+.top{
+	width: 450px;
+	height: 350px;
+	display: inline-block;
+
+}
+

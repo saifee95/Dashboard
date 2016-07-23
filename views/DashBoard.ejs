@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<script src = "https://d3js.org/d3.v4.min.js"></script>
+<script src = "https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+
+<html>
+<head>
+    <link rel='stylesheet' href='/css/bootstrap.min.css' />
+    <link rel='stylesheet' href='/css/bootstrap-theme.css' />
+    <link rel='stylesheet' href='/css/bootstrap.css' />
+    <link rel='stylesheet' href='/css/w3student.css' />
+    <link rel='stylesheet' href='/css/style.css' />
+
+</head>
+<body>
+
+  	<h1 align="center">Student Performance Dashboard</h1>
+  	<p style="text-align:center">Click on a graph to zoom</p>
+  	<div id = "Test" class = "test" onclick="document.getElementById('id01').style.display='block'" ></div>
+
+	<!--code fragment for the animate zoom effect  -->
+	<div id="id01" class="w3-modal w3-animate-zoom">
+  		<div class="w3-modal-content w3-card-8">
+    	<header class="w3-container w3-teal"><span onclick="document.getElementById('id01').style.display='none'" class="w3-closebtn">&times;</span></header>
+    	<div class="w3-container" id = "pl"></div>
+    	<footer class="w3-container w3-teal">
+    	</footer>
+  		</div>
+	</div>
+
+	<!--div element for pie chart  -->
+  	<div id = "pie" class = "pie" onclick="document.getElementById('id02').style.display='block'"></div>
+
+  	<div id="id02" class="w3-modal w3-animate-zoom">
+  		<div class="w3-modal-content w3-card-8">
+    	<header class="w3-container w3-teal"><span onclick="document.getElementById('id02').style.display='none'" class="w3-closebtn">&times;</span></header>
+    		<div class="w3-container" id = "pi"></div>
+    		<footer class="w3-container w3-teal">
+    		</footer>
+  		</div>
+	</div>
+
+	<!--div element for table  -->
+  	<table class = "table new-table table-bordered table-striped" id = "ra"><tr><td>Id</td><td>Rank</td></tr></table>
+
+  	<!--div element for topic-wise graph chart  -->
+  	<div id = "top" class = "top" onclick="document.getElementById('id03').style.display='block'"></div>
+
+  	<div id="id03" class="w3-modal w3-animate-zoom">
+  		<div class="w3-modal-content w3-card-8">
+    	<header class="w3-container w3-teal"><span onclick="document.getElementById('id03').style.display='none'" class="w3-closebtn">&times;</span></header>
+    	<div class="w3-container" id = "tp"></div>
+    	<footer class="w3-container w3-teal"></footer>
+  		</div>
+	</div>
+
+  	<div id = "Tt" class = "Tt" onclick="document.getElementById('id04').style.display='block'"></div>
+
+    <div id="id04" class="w3-modal w3-animate-zoom">
+  		<div class="w3-modal-content w3-card-8">
+    	<header class="w3-container w3-teal"><span onclick="document.getElementById('id04').style.display='none'" class="w3-closebtn">&times;</span></header>
+    	<div class="w3-container" id = "t"></div>
+    	<footer class="w3-container w3-teal"></footer>
+  		</div>
+	</div>
+
+  	<div id = "avg" class = "avg"></div>
+</body>
+</html>
+
+
+<script>
+	
+	var csvData = [];						//Array to store data from csv file
+	d3.csv("datafile.csv",function(data){
+
+		csvData = data;
+
+		var attempts = [];		//Array to store student-wise correct answers
+		var totattempts = [];	//Array to store student-wise total attempts
+		var diffa = [];			//Array to store attempts based on difficulty level
+		var topic = [];			//Array to store Topic wise number of attempts
+		var corr = [];			//Array to store total no of correct answers
+		var studx = [];			//Array to store student ids
+		var study = [];			//Array to store no of attempts
+		var studaccx = [];		//Array to store accuracy of each student
+		var studaccy = [];		
+		var diffx = [];			//Array to store difficulty levels
+		var diffy = [];			//Array to store no of attempts
+		var trattempts = [];	//Array to store correct attempts of students
+		var topax = [];			//Array to store topic codes
+  		var topay = [];
+  		var avgt = [];			//Array to store average time taken by each student
+  		var ttime = [];			//Array to store total time spent on each topic
+  		var tp = [];
+
+  		//Code to group students' correct attempts across all topics under studentId
+  		attempts = d3.nest().key(function(d){return d.StudentID}).key(function(d){return d.Correct}).rollup(function(v){return v.length}).entries(csvData);
+
+  		//Code to group students' attempts across all topics under studentId
+  		totattempts = d3.nest().key(function(d){return d.StudentID}).rollup(function(v){return v.length}).entries(csvData);
+
+  		//Code to group all attempts across all topics under Difficulty level
+  		diffa = d3.nest().key(function(d){return d.Difficulty}).rollup(function(v){return v.length}).entries(csvData);
+
+  		//Code to group students' correct attempts across all topics under studentId
+  		topic = d3.nest().key(function(d){return d.StudentID}).key(function(d){
+
+  			if(isNaN(d.AssessmentItemID[3]) == false)
+  				return d.AssessmentItemID.slice(0,3);
+  			else return d.AssessmentItemID.slice(0,4);
+
+  		}).rollup(function(v){return v.length}).entries(csvData);
+
+  		var topattempts = d3.nest().key(function(d){
+
+  			if(isNaN(d.AssessmentItemID[3]) == false)
+  				return d.AssessmentItemID.slice(0,3);
+  			else return d.AssessmentItemID.slice(0,4);
+
+  		}).rollup(function(v){return v.length}).entries(csvData);
+
+  		//Code to group students' attempts across all topics under TRUE or FALSE 
+  		corr = d3.nest().key(function(d){ return d.Correct}).rollup(function(v){return v.length}).entries(csvData);
+
+  		//Code to group students' correct attempts across all topics under studentId
+  		trattempts = d3.nest().key(function(d){return d.StudentID}).key(function(d){return d.Correct}).rollup(function(v){return v.length}).entries(csvData);
+
+  		//Code to sort trattempts in decreasing order
+  		trattempts.sort(function(a,b){
+
+  			return (b.values[0].value - a.values[0].value);
+  		});
+
+  		//Code to create table of top 10 students
+  		for(var i=0;i<10;i++){
+  			
+  			$('#ra').append('<tr><td>'+trattempts[i].key+'</td><td>'+ (i+1) + '</td></tr>');
+  		}	
+
+  		//Code to calculate average time taken by each student
+  		var tt = d3.nest().key(function(d){return d.StudentID}).rollup(function(v){return d3.mean(v,function(d){return d.TimeTaken;});}).entries(csvData);
+
+  		//Code to calculate total time spent in a topic
+  		var tsot = d3.nest().key(function(d){
+
+  			if(isNaN(d.AssessmentItemID[3]) == false)
+  				return d.AssessmentItemID.slice(0,3);
+  			else return d.AssessmentItemID.slice(0,4);
+
+  		}).rollup(function(v){return d3.sum(v,function(d){return d.TimeTaken;});}).entries(csvData);
+
+  		//Creating x and y coordinates for graph
+  		for(var i=0;i<topattempts.length;i++){
+
+  			topax[i] = topattempts[i].key;
+  			topay[i] = topattempts[i].value;
+  		}
+
+  		for(var i=0;i<totattempts.length;i++){
+
+  			study[i] = totattempts[i].value;
+  			studx[i] = totattempts[i].key;
+  			studaccy[i] = Math.round(((attempts[i].values[0].value)/(attempts[i].values[0].value + attempts[i].values[1].value)*100));
+  			studaccx[i] = attempts[i].key;
+  			avgt[i] = tt[i].value;
+
+  		}
+
+  		for(var i=0;i<tsot.length;i++){
+
+  			tp[i] = tsot[i].key;
+  			ttime[i] = tsot[i].value;
+  		}
+
+  		for(var i=0;i<diffa.length;i++){
+
+  				diffy[i] = diffa[i].value;
+  				diffx[i] = diffa[i].key;
+  		}
+
+
+  		//Plotting student accuracy using Plotly.js graphing library
+  		var test = document.getElementById('Test');
+  		Plotly.plot(test,[{
+			x: studaccx,
+			y: studaccy,
+			marker: {
+      			color: "rgb(250, 150, 0)"
+    		},
+			type: 'bar'}],{
+				title:'Student Accuracy',
+				xaxis:{title:'StudentID'},
+				yaxis:{title:'Accuracy (Percentage)'},
+				font:{
+					color:'#000000'
+				}
+		},{displayModeBar: false});
+
+  		//Replotting the same graph for the modal(enlarged) view
+		var Pl = document.getElementById('pl');
+  		Plotly.plot(Pl,[{
+			x: studaccx,
+			y: studaccy,
+			marker: {
+      			color: "rgb(250, 150, 0)"
+    		},
+			type: 'bar'}],{
+				title:'Student Accuracy',
+				xaxis:{title:'StudentID'},
+				yaxis:{title:'Accuracy (Percentage)'},
+				font:{
+					color:'#000000'
+				}
+		},{displayModeBar: false});
+
+  		//Plotting Pie Chart
+		var Pie = document.getElementById('pie');
+  		Plotly.plot(Pie,[{
+			values: diffy,
+			labels: diffx,
+			type: 'pie'}],{
+				title:'Questions Attempted based on Difficulty',
+		},{displayModeBar: false});
+
+		var Pi = document.getElementById('pi');
+  		Plotly.plot(Pi,[{
+			values: diffy,
+			labels: diffx,
+			type: 'pie'}],{
+				title:'Questions Attempted based on Difficulty',
+		},{displayModeBar: false});
+
+  		//graph for topic wise no of attempts
+  		var Top = document.getElementById('top');
+		Plotly.plot(Top,[{
+			x: topax,
+			y: topay,
+			marker: {
+      			color: "rgb(0, 50, 120)"
+    		},
+			type: 'bar'}],{
+				title:'Topic-wise No of Attempts',
+				xaxis:{title:'Topic'},
+				yaxis:{title:'# of Attempts'}
+		},{displayModeBar: false});
+
+		var Tp = document.getElementById('tp');
+		Plotly.plot(Tp,[{
+			x: topax,
+			y: topay,
+			marker: {
+      			color: "rgb(0, 50, 120)"
+    		},
+			type: 'bar'}],{
+				title:'Topic-wise No of Attempts',
+				xaxis:{title:'Topic'},
+				yaxis:{title:'# of Attempts'}
+		},{displayModeBar: false});
+
+		//graph for average time taken by student
+		var Avg = document.getElementById('avg');
+  		Plotly.plot(Avg,[{
+			x: studaccx,
+			y: avgt,
+			type: 'bar'}],{
+				title:'Average Time Taken by Each Student',
+				xaxis:{title:'StudentID'},
+				yaxis:{title:'Avg Time (seconds)'}
+		},{displayModeBar: false});
+
+		var Timt = document.getElementById('Tt');
+  		Plotly.plot(Timt,[{
+			x: tp,
+			y: ttime,
+			type: 'bar'}],{
+				title:'Total Time Spent on Each Topic',
+				xaxis:{title:'Topic'},
+				yaxis:{title:'Time Spent (Seconds)'}
+		},{displayModeBar: false});
+
+		var Tim = document.getElementById('t');
+  		Plotly.plot(Tim,[{
+			x: tp,
+			y: ttime,
+			type: 'bar'}],{
+				title:'Total Time Spent on Each Topic',
+				xaxis:{title:'Topic'},
+				yaxis:{title:'Time Spent (Seconds)'}
+		},{displayModeBar: false});
+	});
+
+</script>
