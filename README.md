@@ -1,4 +1,4 @@
 # Dashboard
 
 URL
-dashbo.herokuapp.com
+https://dashbo.herokuapp.com
